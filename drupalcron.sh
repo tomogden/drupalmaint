@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# 2011-05-03: Run cron using drush. 
+# 2011-05-03: Run cron using drush.
+# 2012-08-10: Only check directories with Drupal's cron.php file.  
 
 # This script will iterate through the www directory of a multiple site install
 # and run the cron.php within each site's directory. 
@@ -19,12 +20,13 @@ MYIPRANGE=127.0.0.1
 cd $SITESROOT # work in the right dir
 for site in $(ls |egrep -v "chroot|default")
 do
-  #if ping -c 1 $site |grep -q $MYIPRANGE # Don't ping, limits it to main domain only. 
-  #then
-  echo ""
-  echo "** $site ************************************"
-  if [ -e /var/www/$site/cron.php ] ; then 
-    cd /var/www/$site/  
-    /usr/local/bin/drush cron
-  fi 
+  if [ -f "$SITESROOT$site/cron.php" ]
+  then
+    echo ""
+    echo "** $site ************************************"
+    if [ -e "$SITESROOT$site/cron.php" ] ; then
+      cd "$SITESROOT$site"
+      /usr/local/bin/drush cron
+    fi
+  fi
 done
